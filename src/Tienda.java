@@ -4,6 +4,7 @@ import java.sql.*;
 public class Tienda {
     private String nombre;
     private Connection conn;
+
     public void iniciarConn() throws Exception {
         Connection conn=null;
         try{
@@ -29,6 +30,9 @@ public class Tienda {
     public Tienda(String name){
         this.nombre=name;
     }
+    public String getName(){
+        return this.nombre;
+    }
     public void leerTelevisores() throws SQLException{
         ResultSet rs=null;
         Statement stm = this.conn.createStatement();
@@ -43,4 +47,29 @@ public class Tienda {
             System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tResolucion: %s\tTipo Pantalla: %s\tPrecio: %.2f",id,marca,pantalla,resolucion,tipoPantalla,precio));
         }
     }
+    public void crearUsuario(String userName, String password, Object tipo){
+        if(tipo instanceof Administrador){
+
+        }else{
+
+        }
+    }
+    public void crearUsuario(String userName, String password){
+        String tipoUsuario;
+        try{
+            String sql = "SELECT tipoUsuario FROM usuarios WHERE email = ? AND contraseña = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userName);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                tipoUsuario = rs.getString("tipo");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
