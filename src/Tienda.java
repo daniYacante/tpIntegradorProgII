@@ -4,7 +4,11 @@ import java.sql.*;
 public class Tienda {
     private String nombre;
     private Connection conn;
-
+    private boolean checkCredenciales(String userName, String password){
+        String patternName="^[a-zA-Z0-9]{4,}$"; //Solo letras minusculas y mayusculas y numeros del 0 al 9, minimo 4 caracteres
+        String patternPass="^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$";//
+        return  userName.matches(patternName) && password.matches(patternPass);
+    }
     public void iniciarConn() throws Exception {
         Connection conn=null;
         try{
@@ -55,21 +59,43 @@ public class Tienda {
         }
     }
     public void crearUsuario(String userName, String password){
-        String tipoUsuario;
-        try{
-            String sql = "SELECT tipoUsuario FROM usuarios WHERE email = ? AND contraseña = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, userName);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
+        if(checkCredenciales(userName, password)) {
+            try {
+                String sql = "INSERT INTO Usuarios VALUES (NULL,?, ?,'CLIENTE')";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, userName);
+                pstmt.setString(2, password);
+                pstmt.execute();
 
-            if (rs.next()) {
-                tipoUsuario = rs.getString("tipo");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        }else{
+            System.out.println("El usuario o la contraseña no cumple con los requisitos");
         }
     }
+    public String loginUsuario(String userName, String password){
+        String tipoUsuario="NULL";
+        if(checkCredenciales(userName, password)) {
+            try {
+                String sql = "SELECT tipo FROM usuarios WHERE userName = ? AND password = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, userName);
+                pstmt.setString(2, password);
+                ResultSet rs = pstmt.executeQuery();
+
+                if (rs.next()) {
+                    tipoUsuario = rs.getString("tipo");
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }else{
+            throw new IllegalArgumentException("Nombre de usuario o contraseña incorrectos");
+        }
+        return tipoUsuario;
+    }
+
 
 }
