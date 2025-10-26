@@ -51,6 +51,68 @@ public class Tienda {
             System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tResolucion: %s\tTipo Pantalla: %s\tPrecio: %.2f",id,marca,pantalla,resolucion,tipoPantalla,precio));
         }
     }
+    public void leerCelulares() throws SQLException{
+        ResultSet rs=null;
+        Statement stm = this.conn.createStatement();
+        rs=stm.executeQuery("SELECT * FROM Celulares");
+        if(rs.next()){
+            int id =rs.getInt("Id");
+            String marca=rs.getString("Marca");
+            int pantalla =rs.getInt("Pantalla");
+            String ram=rs.getString("RAM");
+            String rom=rs.getString("ROM");
+            String camara=rs.getString("Camara");
+            double precio= rs.getDouble("Precio");
+            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tRAM: %s\tROM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,ram,rom,camara,precio));
+        }
+    }
+    public void leerTablets() throws SQLException{
+        ResultSet rs=null;
+        Statement stm = this.conn.createStatement();
+        rs=stm.executeQuery("SELECT * FROM Tablets");
+        if(rs.next()){
+            int id =rs.getInt("Id");
+            String marca=rs.getString("Marca");
+            int pantalla =rs.getInt("Pantalla");
+            String ram=rs.getString("RAM");
+            String rom=rs.getString("ROM");
+            String camara=rs.getString("Camara");
+            double precio= rs.getDouble("Precio");
+            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tRAM: %s\tROM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,ram,rom,camara,precio));
+        }
+    }
+    public void leerNotebooks() throws SQLException{
+        ResultSet rs=null;
+        Statement stm = this.conn.createStatement();
+        rs=stm.executeQuery("SELECT * FROM Notebooks");
+        if(rs.next()){
+            int id =rs.getInt("Id");
+            String marca=rs.getString("Marca");
+            int pantalla =rs.getInt("Pantalla");
+            String procesador=rs.getString("Procesador");
+            String disco=rs.getString("Disco");
+            String ram=rs.getString("RAM");
+            String camara=rs.getString("Camara");
+            double precio= rs.getDouble("Precio");
+            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tProcesador: %s\tDisco: %s\tRAM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,procesador,disco,ram,camara,precio));
+        }
+    }
+    public void leerPCs() throws SQLException{
+        ResultSet rs=null;
+        Statement stm = this.conn.createStatement();
+        rs=stm.executeQuery("SELECT * FROM PCs");
+        if(rs.next()){
+            int id =rs.getInt("Id");
+            String marca=rs.getString("Marca");
+            String procesador=rs.getString("Procesador");
+            String disco=rs.getString("Disco");
+            String ram=rs.getString("RAM");
+            String tarjetaVideo=rs.getString("Tarjeta de video");
+            String fuente=rs.getString("Fuente");
+            double precio= rs.getDouble("Precio");
+            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tProcesador: %s\tDisco: %s\tRAM: %s\tTarjeta de video: %s\tFuente: %s\tPrecio: %.2f",id,marca,procesador,disco,ram,tarjetaVideo,fuente,precio));
+        }
+    }
     public void crearUsuario(String userName, String password, Object tipo){
         if(tipo instanceof Administrador){
 
