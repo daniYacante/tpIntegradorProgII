@@ -17,6 +17,11 @@ public class Carrito {
             }
         }
     }
+    public void ver(){
+        for(Producto prod:this.productos){
+            prod.getInfo();
+        }
+    }
 
     public void verTotal(){
         //Imprime por pantalla todos los elementos del carrito con su precio, y el precio final

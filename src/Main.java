@@ -20,66 +20,6 @@ Deben utilizarse composición y agregación para representar relaciones entre cl
 public class Main {
     public static void main(String[] args) {
         Tienda mercadito= new Tienda("Mercadito");
-        Scanner sc = new Scanner(System.in);
-        Console console = System.console();
-
-        try {
-            mercadito.iniciarConn();
-            boolean seguir=true;
-            int opt=0;
-            System.out.println("Bienvenidos a "+mercadito.getName());
-            while (seguir){
-                System.out.println("¿Que desea hacer?");
-                System.out.println("1)- Logearse\n2)- Crear Usuario\n3)- Ver Productos\n0)- Salir");
-                try {
-                    opt = sc.nextInt();
-                    switch (opt) {
-                        case 1:
-                            System.out.print("Ingrese nombre de usuario\n");
-                            String name = sc.next();
-                            System.out.println("Ingrese contraseña\n");
-                            String pass = sc.next();
-                            try {
-                                String tipo=mercadito.loginUsuario(name, pass);
-                                System.out.println("logueado como: "+tipo);
-                            } catch (Exception e) {
-                                System.out.println("Error al logearse"+e.getMessage());
-                            }
-                            break;
-                        case 2:
-                            System.out.println("El nombre de usuario debe tener un minimo de 4 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.");
-                            System.out.println("La contraseña debe tener un minimo de 6 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.");
-                            System.out.print("Ingrese nombre de usuario\n");
-                            name = sc.next();
-                            System.out.println("Ingrese contraseña");
-                            pass = sc.next();
-                            //char[] pass = console.readPassword("Contraseña: ");
-                            try {
-                                mercadito.crearUsuario(name, pass);
-                            } catch (Exception e) {
-                                System.out.println("Error al crear usuario");
-                            }
-                            break;
-                        case 3:
-                            break;
-                        default:
-                            seguir = false;
-                            break;
-                    }
-                }catch (Exception e){
-                    System.out.println("Lo ingresado no es un numero");
-                    sc.nextLine();
-                }
-            }
-            mercadito.leerTelevisores();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        try {
-            mercadito.closeConn();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-
+        mercadito.iniciar();
     }
 }

@@ -1,4 +1,4 @@
-public /*abstract*/ class Producto {
+public /*abstract*/ class Producto{
     private int id;
     private String categoria;
     private String marca;

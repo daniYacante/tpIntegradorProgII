@@ -1,15 +1,79 @@
 import java.net.ConnectException;
 import java.sql.*;
+import java.util.Scanner;
 
 public class Tienda {
     private String nombre;
     private Connection conn;
+    private Usuario user;
     private boolean checkCredenciales(String userName, String password){
         String patternName="^[a-zA-Z0-9]{4,}$"; //Solo letras minusculas y mayusculas y numeros del 0 al 9, minimo 4 caracteres
         String patternPass="^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$";//
         return  userName.matches(patternName) && password.matches(patternPass);
     }
-    public void iniciarConn() throws Exception {
+    public void iniciar(){
+        Scanner sc = new Scanner(System.in);
+        //Console console = System.console();
+        try {
+            this.iniciarConn();
+            boolean seguir=true;
+            int opt=0;
+            System.out.println("Bienvenidos a "+this.getName());
+            while (seguir){
+                System.out.println("¿Que desea hacer?");
+                System.out.println("1)- Logearse\n2)- Crear Usuario\n3)- Ver Productos\n0)- Salir");
+                try {
+                    opt = sc.nextInt();
+                    switch (opt) {
+                        case 1:
+                            System.out.print("Ingrese nombre de usuario\n");
+                            String name = sc.next();
+                            System.out.println("Ingrese contraseña\n");
+                            String pass = sc.next();
+                            try {
+                                user=this.loginUsuario(name, pass);
+                                System.out.println("Logueado como: "+user.getTipo());
+                            } catch (Exception e) {
+                                System.out.println("Error al logearse"+e.getMessage());
+                            }
+                            break;
+                        case 2:
+                            System.out.println("El nombre de usuario debe tener un minimo de 4 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.");
+                            System.out.println("La contraseña debe tener un minimo de 6 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.");
+                            System.out.print("Ingrese nombre de usuario\n");
+                            name = sc.next();
+                            System.out.println("Ingrese contraseña");
+                            pass = sc.next();
+                            //char[] pass = console.readPassword("Contraseña: ");
+                            try {
+                                this.crearUsuario(name, pass);
+                            } catch (Exception e) {
+                                System.out.println("Error al crear usuario");
+                            }
+                            break;
+                        case 3:
+                            break;
+                        default:
+                            seguir = false;
+                            break;
+                    }
+                }catch (Exception e){
+                    System.out.println("Lo ingresado no es un numero");
+                    sc.nextLine();
+                }
+            }
+            this.leerTelevisores();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        try {
+            this.closeConn();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+    }
+    private void iniciarConn() throws Exception {
         Connection conn=null;
         try{
             Class.forName("org.sqlite.JDBC");
@@ -136,20 +200,26 @@ public class Tienda {
             System.out.println("El usuario o la contraseña no cumple con los requisitos");
         }
     }
-    public String loginUsuario(String userName, String password){
-        String tipoUsuario="NULL";
+    public Usuario loginUsuario(String userName, String password){
+        Usuario tipoUsuario=null;
         if(checkCredenciales(userName, password)) {
             try {
-                String sql = "SELECT tipo FROM usuarios WHERE userName = ? AND password = ?";
+                String sql = "SELECT * FROM usuarios WHERE userName = ? AND password = ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, userName);
                 pstmt.setString(2, password);
                 ResultSet rs = pstmt.executeQuery();
-
+                String tipo="";
                 if (rs.next()) {
-                    tipoUsuario = rs.getString("tipo");
+                    tipo = rs.getString("tipo");
+                }else{
+                    throw new RuntimeException("No existe el usuario");
                 }
-
+                if(tipo.equals("CLIENTE")){
+                    tipoUsuario = new Cliente();
+                }else if(tipo.equals("ADMINISTRADOR")){
+                    tipoUsuario = new Administrador();
+                }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
