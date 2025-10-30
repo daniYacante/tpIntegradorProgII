@@ -1,23 +1,78 @@
 import java.net.ConnectException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Tienda {
+public class Tienda implements pedirPorTeclado {
     private String nombre;
     private Connection conn;
-    private Usuario user;
+    private Usuario user=null;
     private boolean checkCredenciales(String userName, String password){
         String patternName="^[a-zA-Z0-9]{4,}$"; //Solo letras minusculas y mayusculas y numeros del 0 al 9, minimo 4 caracteres
         String patternPass="^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$";//
         return  userName.matches(patternName) && password.matches(patternPass);
     }
+    public void explorarTienda(){
+        boolean NHF=true;
+        int resp;
+        while(NHF){
+            resp=(int)leerPorTeclado("¿Que categoria de productos desea ver?" +
+                    "\n1) Televisores" +
+                    "\n2) Notebooks" +
+                    "\n3) PC de Escritorio" +
+                    "\n4) Celulares" +
+                    "\n5) Tablets" +
+                    "\n6) Salir",Integer.class);
+            switch(resp){
+                case 1:
+                    try {
+                        this.leerTelevisores();
+                    }catch (Exception e){
+                        System.out.println("Error al leer televisores");
+                    }
+                    break;
+                case 2:
+                    try {
+                        this.leerNotebooks();
+                    }catch (Exception e){
+                        System.out.println("Error al leer Notebooks");
+                    }
+                    break;
+                case 3:
+                    try {
+                        this.leerPCs();
+                    }catch (Exception e){
+                        System.out.println("Error al leer las PC");
+                    }
+                    break;
+                case 4:
+                    try {
+                        this.leerCelulares();
+                    }catch (Exception e){
+                        System.out.println("Error al leer los Celulares");
+                    }
+                    break;
+                case 5:
+                    try {
+                        this.leerTablets();
+                    }catch (Exception e){
+                        System.out.println("Error al leer las Tablets");
+                    }
+                    break;
+                default:
+                    NHF=false;
+                    break;
+            }
+
+        }
+    }
     public void iniciar(){
         Scanner sc = new Scanner(System.in);
+        int opt=0;
         //Console console = System.console();
         try {
             this.iniciarConn();
             boolean seguir=true;
-            int opt=0;
             System.out.println("Bienvenidos a "+this.getName());
             while (seguir){
                 System.out.println("¿Que desea hacer?");
@@ -33,6 +88,7 @@ public class Tienda {
                             try {
                                 user=this.loginUsuario(name, pass);
                                 System.out.println("Logueado como: "+user.getTipo());
+                                seguir=false;
                             } catch (Exception e) {
                                 System.out.println("Error al logearse"+e.getMessage());
                             }
@@ -52,8 +108,10 @@ public class Tienda {
                             }
                             break;
                         case 3:
+                            this.explorarTienda();
                             break;
                         default:
+                            System.out.println("Gracias por elegirnos! Vuelva pronto");
                             seguir = false;
                             break;
                     }
@@ -62,14 +120,54 @@ public class Tienda {
                     sc.nextLine();
                 }
             }
-            this.leerTelevisores();
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-        try {
-            this.closeConn();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+        if(user!=null && user instanceof Cliente){
+            boolean seguir=true;
+            while(seguir){
+                opt= (int) leerPorTeclado("¿Que desea hacer?" +
+                        "\n1) Ver datos" +
+                        "\n2) Modificar datos" +
+                        "\n3) Ver Carrito" +
+                        "\n4) Ver Productos de la tienda" +
+                        "\n5) Salir",Integer.class);
+                switch(opt){
+                    case 1:
+                        ((Cliente) user).verDatos();
+                        break;
+                    case 2:
+                        ArrayList<String> values =((Cliente) user).updateDatos();
+                        try {
+                            String sql = "INSERT INTO Clientes VALUES (NULL,?,?,?,?,?,?,?) WHERE id="+((Cliente) user).getId();
+                            PreparedStatement pstmt = conn.prepareStatement(sql);
+                            for(int i=0;i<values.size();i++){
+                                pstmt.setString(i, values.get(i));
+                            }
+                            pstmt.execute();
+
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    case 3:
+                        ((Cliente) user).verCarrito();
+                        break;
+                    case 4:
+                        this.explorarTienda();
+                        break;
+                    default:
+                        seguir = false;
+                        break;
+                }
+            }
+
+        }else{
+            try {
+                this.closeConn();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
         }
 
     }
@@ -105,7 +203,8 @@ public class Tienda {
         ResultSet rs=null;
         Statement stm = this.conn.createStatement();
         rs=stm.executeQuery("SELECT * FROM Televisores");
-        if(rs.next()){
+
+        while (rs.next()){
             int id =rs.getInt("Id");
             String marca=rs.getString("Marca");
             int pantalla =rs.getInt("Pantalla");
@@ -216,7 +315,7 @@ public class Tienda {
                     throw new RuntimeException("No existe el usuario");
                 }
                 if(tipo.equals("CLIENTE")){
-                    tipoUsuario = new Cliente();
+                    tipoUsuario = new Cliente(rs.getInt("Id"),rs.getInt("Dni"),rs.getString("UserName"),rs.getString("Nombre"),rs.getString("Apellido"),rs.getString("direccion"),rs.getString("medioPago"));
                 }else if(tipo.equals("ADMINISTRADOR")){
                     tipoUsuario = new Administrador();
                 }

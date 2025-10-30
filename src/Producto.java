@@ -9,6 +9,8 @@ public /*abstract*/ class Producto{
         return id;
     }
 
+    public void getInfo(){}
+
     public void setId(int id) {
         this.id = id;
     }
