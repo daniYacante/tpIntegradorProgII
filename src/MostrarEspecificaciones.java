@@ -1,3 +1,3 @@
 public interface MostrarEspecificaciones {
-    String mostrarEspecificaciones();
+    String getInfo();
 }

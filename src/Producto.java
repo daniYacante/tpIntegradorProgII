@@ -1,4 +1,4 @@
-public /*abstract*/ class Producto {
+public /*abstract*/ class Producto{
     private int id;
     private String categoria;
     private String marca;
@@ -8,6 +8,8 @@ public /*abstract*/ class Producto {
     public int getId() {
         return id;
     }
+
+    public void getInfo(){}
 
     public void setId(int id) {
         this.id = id;
