@@ -30,6 +30,7 @@ public class Cliente extends Usuario implements pedirPorTeclado{
     public int getDni() {
         return this.dni;
     }
+    public Carrito getCarrito() {return this.carrito;}
     public Cliente(int id, int dni, String userName,String nombre,String apellido, String direccion,String email, String metodoPago) {
         this.userName = userName;
         this.nombre = nombre;
@@ -47,8 +48,22 @@ public class Cliente extends Usuario implements pedirPorTeclado{
         //El cliente agrega el id de un producto a su carrito
         this.carrito.agregarProducto(item);
     }
-    public void pagar(){
+    public boolean pagar() throws EntradaInvalidaException {
         //El cliente paga el total de su carrito generando una orden de compra
+        int resp=(int)leerPorTeclado("¿Finalizar compra?:\n1) Si\n2) No",Integer.class);
+        if (resp==1){
+            System.out.println("Comprador:");
+            verDatos();
+            System.out.println("Total: "+carrito.getTotal());
+            int resp2=(int)leerPorTeclado("CONFIRMAR COMPRA:\n1) Si\n2) No",Integer.class);
+            if (resp2==1) {
+
+                System.out.println("COMPRA FINALIZADA CON EXITO");
+                return true;
+            }
+
+        }
+        return false;
     }
 
     public void verDatos(){

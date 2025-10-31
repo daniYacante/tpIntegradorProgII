@@ -30,4 +30,8 @@ public class Carrito {
     public String getTotal(){
         return String.format("%f",this.total);
     }
+
+    public ArrayList<Producto> getProductos() {
+        return productos;
+    }
 }

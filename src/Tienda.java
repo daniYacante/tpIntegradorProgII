@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Tienda implements pedirPorTeclado {
@@ -296,6 +297,20 @@ public class Tienda implements pedirPorTeclado {
                         break;
                     case 3:
                         ((Cliente) user).verCarrito();
+                        if (((Cliente) user).getCarrito()!=null){
+                            try {
+                                if(((Cliente) user).pagar()){
+                                    try {
+                                        actulizarStock(((Cliente)user).getCarrito().getProductos());
+                                    }catch (Exception e){
+                                        System.out.println(e.getMessage());
+                                    }
+
+                                }
+                            } catch (EntradaInvalidaException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
                         break;
                     case 4:
                         this.explorarTienda();
@@ -435,6 +450,15 @@ public class Tienda implements pedirPorTeclado {
         stm.close();
         rs.close();
     }
+
+    public void actulizarStock(ArrayList<Producto> productos) throws SQLException{
+        for(Producto p: productos){
+            Statement stm = this.conn.createStatement();
+            stm.executeUpdate("UPDATE * FROM "+p.getCategoria()+" Stock='"+(p.getStock()-1)+" WHERE Product_Id="+p.getId());
+            stm.close();
+        }
+    }
+
     public void crearUsuario(String userName, String password, Object tipo){
         if(tipo instanceof Administrador){
 
