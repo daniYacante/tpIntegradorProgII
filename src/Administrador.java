@@ -62,7 +62,7 @@ public class Administrador extends Usuario implements pedirPorTeclado{
         }
         switch (opt2) {
             case 1:
-                 tabla="Clientes";
+                tabla="Clientes";
                 break;
             case 2:
                 tabla= "Administradores";
@@ -81,6 +81,8 @@ public class Administrador extends Usuario implements pedirPorTeclado{
                 break;
             case 7:
                 tabla=  "Tablets";
+                break;
+            case 8:
                 break;
             default:
                 System.out.println("Opcion no valida");
@@ -116,7 +118,13 @@ public class Administrador extends Usuario implements pedirPorTeclado{
                 case 2:
                     resp=selectTabla("Modificar");
                     if (!resp.isEmpty()){
-                        readTabla(connexion,resp);
+                        try {
+                            modifyTabla(connexion,resp);
+                        } catch (SQLException e) {
+                            System.out.println("Error al modificar la tabla--"+e.getMessage());;
+                        } catch (EntradaInvalidaException e) {
+                            System.out.println("Error al modificar la tabla por problemas de tipos de datos--"+e.getMessage());;
+                        }
                     }else{
                         continue;
                     }
@@ -148,6 +156,7 @@ public class Administrador extends Usuario implements pedirPorTeclado{
         Map<String, Object> values = new HashMap<>();
 
         String sqlColumns = "SELECT * FROM " + tabla;
+        int id= (int) leerPorTeclado("Ingrese el id de la fila a modificar",Integer.class);
         try{
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sqlColumns);
@@ -157,6 +166,7 @@ public class Administrador extends Usuario implements pedirPorTeclado{
             for (int i = 1; i <= columnas; i++) {
                 System.out.print(metaData.getColumnName(i) + "\t");
             }
+            System.out.println();
         } catch (SQLException e) {
             throw new SQLException("Error al mostrar las columnas: " + e.getMessage());
         }
@@ -191,24 +201,28 @@ public class Administrador extends Usuario implements pedirPorTeclado{
             i++;
         }
 
-        sql.append(" WHERE ").append(idCampo).append(" = ?");
+        sql.append(" WHERE ").append("Id").append(" = ?");
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-            // Asignar valores de los campos
+        try{
+            PreparedStatement stmt = conn.prepareStatement(sql.toString());
             int index = 1;
             for (Object valor : values.values()) {
                 stmt.setObject(index++, valor);
             }
+            stmt.setObject(index, id);
 
-            // Asignar valor del ID
-            stmt.setObject(index, idValor);
-
-            int filasAfectadas = stmt.executeUpdate();
-            System.out.println("Filas actualizadas: " + filasAfectadas);
+            stmt.executeUpdate();
+            System.out.println("Campos Actualizados Exitosamente");
+        }catch(SQLException e) {
+            System.out.println("Error al modificar los campos");
         }
     }
 
-}
-    private void deleteTabla(){}
-    private void createTabla(){}
+
+    private void deleteTabla(){
+        System.out.println("Vamos a borrar algo");
+    }
+    private void createTabla(){
+        System.out.println("Vamos a crear algo");
+    }
 }
