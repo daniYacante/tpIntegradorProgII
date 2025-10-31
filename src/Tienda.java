@@ -454,16 +454,8 @@ public class Tienda implements pedirPorTeclado {
     public void actulizarStock(ArrayList<Producto> productos) throws SQLException{
         for(Producto p: productos){
             Statement stm = this.conn.createStatement();
-            stm.executeUpdate("UPDATE * FROM "+p.getCategoria()+" Stock='"+(p.getStock()-1)+" WHERE Product_Id="+p.getId());
+            stm.executeUpdate("UPDATE "+p.getCategoria()+"SET Stock="+(p.getStock()-1)+ "WHERE Product_Id="+p.getId());
             stm.close();
-        }
-    }
-
-    public void crearUsuario(String userName, String password, Object tipo){
-        if(tipo instanceof Administrador){
-
-        }else{
-
         }
     }
     public void crearUsuario(String userName, String password){

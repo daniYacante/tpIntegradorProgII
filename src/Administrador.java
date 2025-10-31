@@ -62,7 +62,7 @@ public class Administrador extends Usuario implements pedirPorTeclado{
         }
         switch (opt2) {
             case 1:
-                tabla="Clientes";
+                tabla= "Clientes";
                 break;
             case 2:
                 tabla= "Administradores";
@@ -132,7 +132,13 @@ public class Administrador extends Usuario implements pedirPorTeclado{
                 case 3:
                     resp=selectTabla("Borrar");
                     if (!resp.isEmpty()){
-                        readTabla(connexion,resp);
+                        try {
+                            deleteFromTabla(connexion,resp);
+                        } catch (EntradaInvalidaException e) {
+                            System.out.println("Error al borrar de la tabla, id invalido");
+                        } catch (SQLException e) {
+                            System.out.println("Error al borrar de la tabla");
+                        }
                     }else{
                         continue;
                     }
@@ -140,7 +146,13 @@ public class Administrador extends Usuario implements pedirPorTeclado{
                 case 4:
                     resp=selectTabla("Añadir");
                     if (!resp.isEmpty()){
-                        readTabla(connexion,resp);
+                        try {
+                            addToTabla(connexion,resp);
+                        } catch (EntradaInvalidaException e) {
+                            System.out.println("Error al Añadir a la tabla, dato ingresado no valido");
+                        } catch (SQLException e) {
+                            System.out.println("Error al Añadir a la tabla.");
+                        }
                     }else{
                         continue;
                     }
@@ -219,10 +231,67 @@ public class Administrador extends Usuario implements pedirPorTeclado{
     }
 
 
-    private void deleteTabla(){
-        System.out.println("Vamos a borrar algo");
+    private void deleteFromTabla(Connection conn, String tabla) throws EntradaInvalidaException, SQLException {
+        int idRow =(int)leerPorTeclado("Ingrese fila a borrar:",Integer.class);
+        if(tabla.equals("Clientes")){
+            String consulta="DELETE FROM Clientes WHERE User_Id=?";
+            PreparedStatement stmt=conn.prepareStatement(consulta);
+            stmt.setInt(1,idRow);
+            stmt.execute();
+            consulta="DELETE FROM Usuarios WHERE Id=?";
+            stmt.setInt(1,idRow);
+            stmt.execute();
+        }else {
+            String consulta = "DELETE FROM " + tabla + " WHERE Id=?";
+            PreparedStatement stmt = conn.prepareStatement(consulta);
+            stmt.setInt(1, idRow);
+            stmt.execute();
+        }
     }
-    private void createTabla(){
-        System.out.println("Vamos a crear algo");
+    private void addToTabla(Connection conn, String tabla) throws EntradaInvalidaException, SQLException {
+        StringBuilder sql = new StringBuilder("INSERT INTO"+tabla+" VALUES(");
+        Map<String, Object> values = new HashMap<>();
+
+        String sqlColumns = "SELECT * FROM " + tabla;
+        try{
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlColumns);
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnas = metaData.getColumnCount();
+            System.out.println("Ingrese los valores para los siguientes campos:");
+            for (int i = 1; i <= columnas; i++) {
+                String valor=leerPorTeclado(metaData.getColumnName(i)+": ",String.class).toString();
+                values.put(metaData.getColumnName(i), valor);
+            }
+            System.out.println();
+        } catch (SQLException e) {
+            throw new SQLException("Error al mostrar las columnas: " + e.getMessage());
+        }
+        int i = 0;
+        for (String campo : values.keySet()) {
+            sql.append(campo).append(" = ?");
+            if (i < values.size() - 1) {
+                sql.append(", ");
+            }
+            i++;
+        }
+
+        sql.append(")");
+
+        try{
+            PreparedStatement stmt = conn.prepareStatement(sql.toString(),Statement.RETURN_GENERATED_KEYS);
+            int index = 1;
+            for (Object valor : values.values()) {
+                stmt.setObject(index++, valor);
+            }
+
+            stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            rs.next();
+            System.out.println("Campos Actualizados Exitosamente, Id generado= "+rs.getInt(1));
+        }catch(SQLException e) {
+            System.out.println("Error al modificar los campos");
+        }
+
     }
 }
