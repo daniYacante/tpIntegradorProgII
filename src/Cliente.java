@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class Cliente extends Usuario implements pedirPorTeclado{
     final private int id;
     private int dni;
@@ -12,6 +9,7 @@ public class Cliente extends Usuario implements pedirPorTeclado{
     private String email;
     private Carrito carrito;
 
+    public String getUserName(){return this.userName;}
     public String getNombre() {
         return nombre;
     }
@@ -31,6 +29,12 @@ public class Cliente extends Usuario implements pedirPorTeclado{
     public String getEmail() {
         return email;
     }
+    public int  getId() {
+        return this.id;
+    }
+    public int getDni() {
+        return this.dni;
+    }
     public Cliente(int id, int dni, String userName,String nombre,String apellido, String direccion,String email, String metodoPago) {
         this.userName = userName;
         this.nombre = nombre;
@@ -41,22 +45,15 @@ public class Cliente extends Usuario implements pedirPorTeclado{
         this.direccion = direccion;
         this.metodoPago = metodoPago;
         this.tipo = "Cliente";
+        this.carrito=new Carrito();
     }
 
-    public void verProducto(){
-        //El cliente pide ver la descripcion de un producto mediante el id
-    }
-    public void agregarAlCarrito(){
+    public void agregarAlCarrito(Producto item){
         //El cliente agrega el id de un producto a su carrito
+        this.carrito.agregarProducto(item);
     }
     public void pagar(){
         //El cliente paga el total de su carrito generando una orden de compra
-    }
-    public int  getId() {
-        return this.id;
-    }
-    public int getDni() {
-        return this.dni;
     }
 
     public void verDatos(){
@@ -108,6 +105,13 @@ public class Cliente extends Usuario implements pedirPorTeclado{
     //return values;
     }
     public void verCarrito(){
-        this.carrito.ver();
+        try {
+            System.out.println("Tu carrito:");
+            this.carrito.ver();
+            System.out.println("Total: "+carrito.getTotal());
+        }catch(Exception e){
+            System.out.println("El carrito esta vacio, añade algo primero");
+        }
+
     }
 }

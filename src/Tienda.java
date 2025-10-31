@@ -1,12 +1,11 @@
-import java.net.ConnectException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Tienda implements pedirPorTeclado {
     private String nombre;
     private Connection conn;
     private Usuario user=null;
+    Carrito carritoTemp;
     private boolean checkCredenciales(String userName, String password){
         String patternName="^[a-zA-Z0-9]{4,}$"; //Solo letras minusculas y mayusculas y numeros del 0 al 9, minimo 4 caracteres
         String patternPass="^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$";//
@@ -15,6 +14,9 @@ public class Tienda implements pedirPorTeclado {
     public void explorarTienda(){
         boolean NHF=true;
         int resp;
+        if(this.user==null){
+            carritoTemp=new Carrito();
+        }
         while(NHF){
             resp=(int)leerPorTeclado("¿Que categoria de productos desea ver?" +
                     "\n1) Televisores" +
@@ -27,6 +29,32 @@ public class Tienda implements pedirPorTeclado {
                 case 1:
                     try {
                         this.leerTelevisores();
+                        int respAdd=(int)leerPorTeclado("¿Desea agregar algun elemento?\n1) Si\n2) No",Integer.class);
+                        if (respAdd==1){
+                            int idItem =(int)leerPorTeclado("Ingrese el Id del producto a añadir",Integer.class);
+                            Statement stm = this.conn.createStatement();
+                            ResultSet rs=stm.executeQuery("SELECT * FROM Televisores WHERE Product_Id="+idItem);
+                            if(rs.next()){
+                                Televisor tele= new Televisor(
+                                        rs.getInt("Product_Id"),
+                                        rs.getString("Marca"),
+                                        rs.getInt("Stock"),
+                                        rs.getDouble("Precio"),
+                                        rs.getDouble("Pantalla"),
+                                        rs.getString("Resolucion"),
+                                        rs.getString("TipoPantalla")
+                                );
+                                if(this.user==null){
+                                    carritoTemp.agregarProducto(tele);
+                                }else{
+                                    ((Cliente)user).agregarAlCarrito(tele);
+                                }
+                            }else{
+                                System.out.println("El producto no existe");
+                            }
+                            stm.close();
+                            rs.close();
+                        }
                     }catch (Exception e){
                         System.out.println("Error al leer televisores");
                     }
@@ -34,6 +62,32 @@ public class Tienda implements pedirPorTeclado {
                 case 2:
                     try {
                         this.leerNotebooks();
+                        int respAdd=(int)leerPorTeclado("¿Desea agregar algun elemento?\n1) Si\n2) No",Integer.class);
+                        if (respAdd==1){
+                            int idItem =(int)leerPorTeclado("Ingrese el Id del producto a añadir",Integer.class);
+                            Statement stm = this.conn.createStatement();
+                            ResultSet rs=stm.executeQuery("SELECT * FROM Notebooks WHERE Product_Id="+idItem);
+                            if(rs.next()){
+                                Notebook note= new Notebook(
+                                        rs.getInt("Product_Id"),
+                                        rs.getString("Marca"),
+                                        rs.getInt("Stock"),
+                                        rs.getDouble("Precio"),
+                                        rs.getDouble("Pantalla"),
+                                        rs.getString("Procesador"),
+                                        rs.getInt("Disco")
+                                );
+                                if(this.user==null){
+                                    carritoTemp.agregarProducto(note);
+                                }else{
+                                    ((Cliente)user).agregarAlCarrito(note);
+                                }
+                            }else{
+                                System.out.println("El producto no existe");
+                            }
+                            stm.close();
+                            rs.close();
+                        }
                     }catch (Exception e){
                         System.out.println("Error al leer Notebooks");
                     }
@@ -41,6 +95,34 @@ public class Tienda implements pedirPorTeclado {
                 case 3:
                     try {
                         this.leerPCs();
+                        int respAdd=(int)leerPorTeclado("¿Desea agregar algun elemento?\n1) Si\n2) No",Integer.class);
+                        if (respAdd==1){
+                            int idItem =(int)leerPorTeclado("Ingrese el Id del producto a añadir",Integer.class);
+                            Statement stm = this.conn.createStatement();
+                            ResultSet rs=stm.executeQuery("SELECT * FROM PCs WHERE Product_Id="+idItem);
+                            if(rs.next()){
+                                PC compu= new PC(
+                                        rs.getInt("Product_Id"),
+                                        rs.getString("Marca"),
+                                        rs.getInt("Stock"),
+                                        rs.getDouble("Precio"),
+                                        rs.getString("Procesador"),
+                                        rs.getInt("Disco"),
+                                        rs.getInt("RAM"),
+                                        rs.getString("Fuente"),
+                                        rs.getString("TarjetaDeVideo")
+                                );
+                                if(this.user==null){
+                                    carritoTemp.agregarProducto(compu);
+                                }else{
+                                    ((Cliente)user).agregarAlCarrito(compu);
+                                }
+                            }else{
+                                System.out.println("El producto no existe");
+                            }
+                            stm.close();
+                            rs.close();
+                        }
                     }catch (Exception e){
                         System.out.println("Error al leer las PC");
                     }
@@ -48,6 +130,34 @@ public class Tienda implements pedirPorTeclado {
                 case 4:
                     try {
                         this.leerCelulares();
+                        int respAdd=(int)leerPorTeclado("¿Desea agregar algun elemento?\n1) Si\n2) No",Integer.class);
+                        if (respAdd==1){
+                            int idItem =(int)leerPorTeclado("Ingrese el Id del producto a añadir",Integer.class);
+                            Statement stm = this.conn.createStatement();
+                            ResultSet rs=stm.executeQuery("SELECT * FROM Celulares WHERE Product_Id="+idItem);
+                            if(rs.next()){
+                                Movil celu= new Movil(
+                                        rs.getInt("Product_Id"),
+                                        "Celular",
+                                        rs.getString("Marca"),
+                                        rs.getInt("Stock"),
+                                        rs.getDouble("Precio"),
+                                        rs.getDouble("Pantalla"),
+                                        rs.getString("Camara"),
+                                        rs.getInt("RAM"),
+                                        rs.getInt("ROM")
+                                );
+                                if(this.user==null){
+                                    carritoTemp.agregarProducto(celu);
+                                }else{
+                                    ((Cliente)user).agregarAlCarrito(celu);
+                                }
+                            }else{
+                                System.out.println("El producto no existe");
+                            }
+                            stm.close();
+                            rs.close();
+                        }
                     }catch (Exception e){
                         System.out.println("Error al leer los Celulares");
                     }
@@ -55,6 +165,34 @@ public class Tienda implements pedirPorTeclado {
                 case 5:
                     try {
                         this.leerTablets();
+                        int respAdd=(int)leerPorTeclado("¿Desea agregar algun elemento?\n1) Si\n2) No",Integer.class);
+                        if (respAdd==1){
+                            int idItem =(int)leerPorTeclado("Ingrese el Id del producto a añadir",Integer.class);
+                            Statement stm = this.conn.createStatement();
+                            ResultSet rs=stm.executeQuery("SELECT * FROM Tablets WHERE Product_Id="+idItem);
+                            if(rs.next()){
+                                Movil tablet= new Movil(
+                                        rs.getInt("Product_Id"),
+                                        "Tablet",
+                                        rs.getString("Marca"),
+                                        rs.getInt("Stock"),
+                                        rs.getDouble("Precio"),
+                                        rs.getDouble("Pantalla"),
+                                        rs.getString("Camara"),
+                                        rs.getInt("RAM"),
+                                        rs.getInt("ROM")
+                                );
+                                if(this.user==null){
+                                    carritoTemp.agregarProducto(tablet);
+                                }else{
+                                    ((Cliente)user).agregarAlCarrito(tablet);
+                                }
+                            }else{
+                                System.out.println("El producto no existe");
+                            }
+                            stm.close();
+                            rs.close();
+                        }
                     }catch (Exception e){
                         System.out.println("Error al leer las Tablets");
                     }
@@ -203,12 +341,15 @@ public class Tienda implements pedirPorTeclado {
         while (rs.next()){
             int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
-            int pantalla =rs.getInt("Pantalla");
+            double pantalla =rs.getDouble("Pantalla");
             String resolucion=rs.getString("Resolucion");
             String tipoPantalla=rs.getString("TipoPantalla");
             double precio= rs.getDouble("Precio");
-            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tResolucion: %s\tTipo Pantalla: %s\tPrecio: %.2f",id,marca,pantalla,resolucion,tipoPantalla,precio));
+            //System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tResolucion: %s\tTipo Pantalla: %s\tPrecio: %.2f",id,marca,pantalla,resolucion,tipoPantalla,precio));
+            System.out.println(String.format("ID: %d\tMarca: %-8s\tPantalla: %-8f\tResolucion: %-8s\tTipo Pantalla: %-8s\tPrecio: %-8.2f",id,marca,pantalla,resolucion,tipoPantalla,precio));
         }
+        stm.close();
+        rs.close();
     }
     public void leerCelulares() throws SQLException{
         ResultSet rs=null;
@@ -217,13 +358,16 @@ public class Tienda implements pedirPorTeclado {
         while (rs.next()){
             int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
-            int pantalla =rs.getInt("Pantalla");
-            String ram=rs.getString("RAM");
-            String rom=rs.getString("ROM");
+            double pantalla =rs.getDouble("Pantalla");
+            int ram=rs.getInt("RAM");
+            int rom=rs.getInt("ROM");
             String camara=rs.getString("Camara");
             double precio= rs.getDouble("Precio");
-            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tRAM: %s\tROM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,ram,rom,camara,precio));
+            //System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tRAM: %s\tROM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,ram,rom,camara,precio));
+            System.out.println(String.format("ID: %d\tMarca: %-8s\tPantalla: %-8.1f\tRAM: %-8s\tROM: %-8s\tCamara: %-8s\tPrecio: %-8.2f",id,marca,pantalla,ram,rom,camara,precio));
         }
+        stm.close();
+        rs.close();
     }
     public void leerTablets() throws SQLException{
         ResultSet rs=null;
@@ -232,13 +376,16 @@ public class Tienda implements pedirPorTeclado {
         while (rs.next()){
             int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
-            int pantalla =rs.getInt("Pantalla");
-            String ram=rs.getString("RAM");
-            String rom=rs.getString("ROM");
+            double pantalla =rs.getDouble("Pantalla");
+            int ram=rs.getInt("RAM");
+            int rom=rs.getInt("ROM");
             String camara=rs.getString("Camara");
             double precio= rs.getDouble("Precio");
-            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tRAM: %s\tROM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,ram,rom,camara,precio));
+            //System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tRAM: %s\tROM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,ram,rom,camara,precio));
+            System.out.println(String.format("ID: %d\tMarca: %-8s\tPantalla: %-8.1f\tRAM: %-8s\tROM: %-8s\tCamara: %-8s\tPrecio: %-8.2f",id,marca,pantalla,ram,rom,camara,precio));
         }
+        stm.close();
+        rs.close();
     }
     public void leerNotebooks() throws SQLException{
         ResultSet rs=null;
@@ -247,13 +394,16 @@ public class Tienda implements pedirPorTeclado {
         while(rs.next()){
             int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
-            int pantalla =rs.getInt("Pantalla");
+            double pantalla =rs.getDouble("Pantalla");
             String procesador=rs.getString("Procesador");
-            String disco=rs.getString("Disco");
-            String ram=rs.getString("RAM");
+            int disco=rs.getInt("Disco");
+            int ram=rs.getInt("RAM");
             double precio= rs.getDouble("Precio");
-            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tProcesador: %s\tDisco: %s\tRAM: %s\tPrecio: %.2f",id,marca,pantalla,procesador,disco,ram,precio));
+            //System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tProcesador: %s\tDisco: %s\tRAM: %s\tPrecio: %.2f",id,marca,pantalla,procesador,disco,ram,precio));
+            System.out.println(String.format("ID: %d\tMarca: %-8s\tPantalla: %-8.1f\tProcesador: %-8s\tDisco: %-8d\tRAM: %-8d\tPrecio: %-8.2f",id,marca,pantalla,procesador,disco,ram,precio));
         }
+        stm.close();
+        rs.close();
     }
     public void leerPCs() throws SQLException{
         ResultSet rs=null;
@@ -263,13 +413,16 @@ public class Tienda implements pedirPorTeclado {
             int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
             String procesador=rs.getString("Procesador");
-            String disco=rs.getString("Disco");
-            String ram=rs.getString("RAM");
+            int disco=rs.getInt("Disco");
+            int ram=rs.getInt("RAM");
             String tarjetaVideo=rs.getString("TarjetaDeVideo");
             String fuente=rs.getString("Fuente");
             double precio= rs.getDouble("Precio");
-            System.out.println(String.format("ID: %d\tMarca: %s\tProcesador: %s\tDisco: %s\tRAM: %s\tTarjeta de video: %s\tFuente: %s\tPrecio: %.2f",id,marca,procesador,disco,ram,tarjetaVideo,fuente,precio));
+            //System.out.println(String.format("ID: %d\tMarca: %s\tProcesador: %s\tDisco: %s\tRAM: %s\tTarjeta de video: %s\tFuente: %s\tPrecio: %.2f",id,marca,procesador,disco,ram,tarjetaVideo,fuente,precio));
+            System.out.println(String.format("ID: %d\tMarca: %-8s\tProcesador: %-8s\tDisco: %-8d\tRAM: %-8d\tTarjeta de video: %-8s\tFuente: %-8s\tPrecio: %-8.2f",id,marca,procesador,disco,ram,tarjetaVideo,fuente,precio));
         }
+        stm.close();
+        rs.close();
     }
     public void crearUsuario(String userName, String password, Object tipo){
         if(tipo instanceof Administrador){
@@ -305,6 +458,9 @@ public class Tienda implements pedirPorTeclado {
                 newPrepStm.setString(6, metodoPago);
                 newPrepStm.setInt(7, dni);
                 newPrepStm.execute();
+
+                pstmt.close();
+                rs.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -337,6 +493,8 @@ public class Tienda implements pedirPorTeclado {
                 }else if(tipo.equals("ADMINISTRADOR")){
                     tipoUsuario = new Administrador();
                 }
+                pstmt.close();
+                rs.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

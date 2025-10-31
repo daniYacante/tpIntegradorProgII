@@ -1,49 +1,32 @@
-public /*abstract*/ class Producto{
-    private int id;
-    private String categoria;
-    private String marca;
-    private int stock;
-    private double precio;
+public abstract class Producto implements MostrarEspecificaciones{
+    protected int id;
+    protected String categoria;
+    protected String marca;
+    protected int stock;
+    protected double precio;
 
     public int getId() {
         return id;
     }
-
-    public void getInfo(){}
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getCategoria() {
         return categoria;
     }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
     public String getMarca() {
         return marca;
     }
-
-    public void setMarca(String marca) {
-        this.marca = marca;
-    }
-
     public int getStock() {
         return stock;
     }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
     public double getPrecio() {
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public Producto(int id, String categoria, String marca, int stock, double precio) {
+        this.id = id;
+        this.categoria = categoria;
+        this.marca = marca;
+        this.stock = stock;
         this.precio = precio;
+
     }
 }
