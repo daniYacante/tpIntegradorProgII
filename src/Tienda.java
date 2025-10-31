@@ -75,50 +75,44 @@ public class Tienda implements pedirPorTeclado {
             boolean seguir=true;
             System.out.println("Bienvenidos a "+this.getName());
             while (seguir){
-                System.out.println("¿Que desea hacer?");
-                System.out.println("1)- Logearse\n2)- Crear Usuario\n3)- Ver Productos\n0)- Salir");
                 try {
-                    opt = sc.nextInt();
-                    switch (opt) {
-                        case 1:
-                            System.out.print("Ingrese nombre de usuario\n");
-                            String name = sc.next();
-                            System.out.println("Ingrese contraseña\n");
-                            String pass = sc.next();
-                            try {
-                                user=this.loginUsuario(name, pass);
-                                System.out.println("Logueado como: "+user.getTipo());
-                                seguir=false;
-                            } catch (Exception e) {
-                                System.out.println("Error al logearse"+e.getMessage());
-                            }
-                            break;
-                        case 2:
-                            System.out.println("El nombre de usuario debe tener un minimo de 4 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.");
-                            System.out.println("La contraseña debe tener un minimo de 6 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.");
-                            System.out.print("Ingrese nombre de usuario\n");
-                            name = sc.next();
-                            System.out.println("Ingrese contraseña");
-                            pass = sc.next();
-                            //char[] pass = console.readPassword("Contraseña: ");
-                            try {
-                                this.crearUsuario(name, pass);
-                            } catch (Exception e) {
-                                System.out.println("Error al crear usuario");
-                            }
-                            break;
-                        case 3:
-                            this.explorarTienda();
-                            break;
-                        default:
-                            System.out.println("Gracias por elegirnos! Vuelva pronto");
-                            seguir = false;
-                            break;
-                    }
+                    opt = (int) leerPorTeclado("¿Que desea hacer?\n1)- Logearse\n2)- Crear Usuario\n3)- Ver Productos\n0)- Salir", Integer.class);
                 }catch (Exception e){
                     System.out.println("Lo ingresado no es un numero");
                     sc.nextLine();
+                    continue;
                 }
+                switch (opt) {
+                    case 1:
+                        String userName= leerPorTeclado("Ingrese nombre de usuario",String.class).toString();
+                        String password =leerPorTeclado("Ingrese contraseña",String.class).toString();
+                        try {
+                            user=this.loginUsuario(userName, password);
+                            System.out.println("Logueado como: "+user.getTipo());
+                            seguir=false;
+                        } catch (Exception e) {
+                            System.out.println("Error al logearse"+e.getMessage());
+                        }
+                        break;
+                    case 2:
+                        String usuario= leerPorTeclado("El nombre de usuario debe tener un minimo de 4 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.\nIngrese nombre de usuario",String.class).toString();
+                        String contraseña = leerPorTeclado("La contraseña debe tener un minimo de 6 caractes y contener solo letras, minusculas y mayusculas, y numeros del 0 al 9.\nIngrese contraseña",String.class).toString();
+                        //char[] pass = console.readPassword("Contraseña: ");
+                        try {
+                            this.crearUsuario(usuario, contraseña);
+                        } catch (Exception e) {
+                            System.out.println("Error al crear usuario");
+                        }
+                        break;
+                    case 3:
+                        this.explorarTienda();
+                        break;
+                    default:
+                        System.out.println("Gracias por elegirnos! Vuelva pronto");
+                        seguir = false;
+                        break;
+                }
+
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -137,13 +131,15 @@ public class Tienda implements pedirPorTeclado {
                         ((Cliente) user).verDatos();
                         break;
                     case 2:
-                        ArrayList<String> values =((Cliente) user).updateDatos();
+                        ((Cliente) user).updateDatos();
                         try {
-                            String sql = "INSERT INTO Clientes VALUES (NULL,?,?,?,?,?,?,?) WHERE id="+((Cliente) user).getId();
+                            String sql = "UPDATE Clientes SET Nombre=?,Apellido=?,Email=?,Direccion=?,MetodoPago=? WHERE User_Id="+((Cliente) user).getId();
                             PreparedStatement pstmt = conn.prepareStatement(sql);
-                            for(int i=0;i<values.size();i++){
-                                pstmt.setString(i, values.get(i));
-                            }
+                            pstmt.setString(1,((Cliente) user).getNombre());
+                            pstmt.setString(2,((Cliente) user).getApellido());
+                            pstmt.setString(3,((Cliente) user).getEmail());
+                            pstmt.setString(4,((Cliente)user).getDireccion());
+                            pstmt.setString(5,((Cliente) user).getMetodoPago());
                             pstmt.execute();
 
                         } catch (SQLException e) {
@@ -205,7 +201,7 @@ public class Tienda implements pedirPorTeclado {
         rs=stm.executeQuery("SELECT * FROM Televisores");
 
         while (rs.next()){
-            int id =rs.getInt("Id");
+            int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
             int pantalla =rs.getInt("Pantalla");
             String resolucion=rs.getString("Resolucion");
@@ -218,8 +214,8 @@ public class Tienda implements pedirPorTeclado {
         ResultSet rs=null;
         Statement stm = this.conn.createStatement();
         rs=stm.executeQuery("SELECT * FROM Celulares");
-        if(rs.next()){
-            int id =rs.getInt("Id");
+        while (rs.next()){
+            int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
             int pantalla =rs.getInt("Pantalla");
             String ram=rs.getString("RAM");
@@ -233,8 +229,8 @@ public class Tienda implements pedirPorTeclado {
         ResultSet rs=null;
         Statement stm = this.conn.createStatement();
         rs=stm.executeQuery("SELECT * FROM Tablets");
-        if(rs.next()){
-            int id =rs.getInt("Id");
+        while (rs.next()){
+            int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
             int pantalla =rs.getInt("Pantalla");
             String ram=rs.getString("RAM");
@@ -248,32 +244,31 @@ public class Tienda implements pedirPorTeclado {
         ResultSet rs=null;
         Statement stm = this.conn.createStatement();
         rs=stm.executeQuery("SELECT * FROM Notebooks");
-        if(rs.next()){
-            int id =rs.getInt("Id");
+        while(rs.next()){
+            int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
             int pantalla =rs.getInt("Pantalla");
             String procesador=rs.getString("Procesador");
             String disco=rs.getString("Disco");
             String ram=rs.getString("RAM");
-            String camara=rs.getString("Camara");
             double precio= rs.getDouble("Precio");
-            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tProcesador: %s\tDisco: %s\tRAM: %s\tCamara: %s\tPrecio: %.2f",id,marca,pantalla,procesador,disco,ram,camara,precio));
+            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tProcesador: %s\tDisco: %s\tRAM: %s\tPrecio: %.2f",id,marca,pantalla,procesador,disco,ram,precio));
         }
     }
     public void leerPCs() throws SQLException{
         ResultSet rs=null;
         Statement stm = this.conn.createStatement();
         rs=stm.executeQuery("SELECT * FROM PCs");
-        if(rs.next()){
-            int id =rs.getInt("Id");
+        while(rs.next()){
+            int id =rs.getInt("Product_Id");
             String marca=rs.getString("Marca");
             String procesador=rs.getString("Procesador");
             String disco=rs.getString("Disco");
             String ram=rs.getString("RAM");
-            String tarjetaVideo=rs.getString("Tarjeta de video");
+            String tarjetaVideo=rs.getString("TarjetaDeVideo");
             String fuente=rs.getString("Fuente");
             double precio= rs.getDouble("Precio");
-            System.out.println(String.format("ID: %d\tMarca: %s\tPantalla: %d\tProcesador: %s\tDisco: %s\tRAM: %s\tTarjeta de video: %s\tFuente: %s\tPrecio: %.2f",id,marca,procesador,disco,ram,tarjetaVideo,fuente,precio));
+            System.out.println(String.format("ID: %d\tMarca: %s\tProcesador: %s\tDisco: %s\tRAM: %s\tTarjeta de video: %s\tFuente: %s\tPrecio: %.2f",id,marca,procesador,disco,ram,tarjetaVideo,fuente,precio));
         }
     }
     public void crearUsuario(String userName, String password, Object tipo){
@@ -287,11 +282,29 @@ public class Tienda implements pedirPorTeclado {
         if(checkCredenciales(userName, password)) {
             try {
                 String sql = "INSERT INTO Usuarios VALUES (NULL,?, ?,'CLIENTE')";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
+                PreparedStatement pstmt = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
                 pstmt.setString(1, userName);
                 pstmt.setString(2, password);
                 pstmt.execute();
-
+                ResultSet rs = pstmt.getGeneratedKeys();
+                rs.next();
+                int newID=rs.getInt(1);
+                String nombre= leerPorTeclado("Indique su nombre",String.class).toString();
+                String apellido= leerPorTeclado("Indique su apellido",String.class).toString();
+                String email= leerPorTeclado("Indique su email",String.class).toString();
+                String direccion= leerPorTeclado("Indique su direccion",String.class).toString();
+                int dni= (int) leerPorTeclado("Indique su dni",Integer.class);
+                String metodoPago= leerPorTeclado("Indique su Metodo de pago",String.class).toString();
+                String consulta = "INSERT INTO Clientes VALUES (NULL,?,?,?,?,?,?,?)";
+                PreparedStatement newPrepStm = conn.prepareStatement(consulta);
+                newPrepStm.setInt(1, newID);
+                newPrepStm.setString(2, nombre);
+                newPrepStm.setString(3, apellido);
+                newPrepStm.setString(4, email);
+                newPrepStm.setString(5, direccion);
+                newPrepStm.setString(6, metodoPago);
+                newPrepStm.setInt(7, dni);
+                newPrepStm.execute();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -303,7 +316,7 @@ public class Tienda implements pedirPorTeclado {
         Usuario tipoUsuario=null;
         if(checkCredenciales(userName, password)) {
             try {
-                String sql = "SELECT * FROM usuarios WHERE userName = ? AND password = ?";
+                String sql = "SELECT * FROM Usuarios WHERE userName = ? AND password = ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, userName);
                 pstmt.setString(2, password);
@@ -315,7 +328,12 @@ public class Tienda implements pedirPorTeclado {
                     throw new RuntimeException("No existe el usuario");
                 }
                 if(tipo.equals("CLIENTE")){
-                    tipoUsuario = new Cliente(rs.getInt("Id"),rs.getInt("Dni"),rs.getString("UserName"),rs.getString("Nombre"),rs.getString("Apellido"),rs.getString("direccion"),rs.getString("medioPago"));
+                    String consulta = "SELECT * FROM Clientes WHERE User_Id=?";
+                    PreparedStatement newPrepStm = conn.prepareStatement(consulta);
+                    newPrepStm.setInt(1, rs.getInt("Id"));
+                    ResultSet rs2 = newPrepStm.executeQuery();
+                    rs2.next();
+                    tipoUsuario = new Cliente(rs2.getInt("Id"),rs2.getInt("DNI"),rs.getString("UserName"),rs2.getString("Nombre"),rs2.getString("Apellido"),rs2.getString("Direccion"),rs2.getString("Email"),rs2.getString("MetodoPago"));
                 }else if(tipo.equals("ADMINISTRADOR")){
                     tipoUsuario = new Administrador();
                 }

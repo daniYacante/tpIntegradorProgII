@@ -14,13 +14,13 @@ public interface pedirPorTeclado {
     default Object leerPorTeclado(String mensaje,Class<?> tipo){
         System.out.println(mensaje);
         Scanner sc = new Scanner(System.in);
+        Object respuesta=null;
         if(tipo==String.class){
-            return sc.next();
+            respuesta = sc.nextLine();
         }else if(tipo==Integer.class){
-            return sc.nextInt();
-        }else{
-            return null;
+            respuesta= sc.nextInt();
         }
-
+        //sc.close();
+        return respuesta;
     }
 }
