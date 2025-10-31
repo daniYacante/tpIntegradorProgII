@@ -1,12 +1,7 @@
 public class Cliente extends Usuario implements pedirPorTeclado{
     final private int id;
-    private int dni;
     private String userName;
-    private  String nombre;
-    private  String apellido;
-    private String direccion;
     private String metodoPago;
-    private String email;
     private Carrito carrito;
 
     public String getUserName(){return this.userName;}
@@ -69,33 +64,63 @@ public class Cliente extends Usuario implements pedirPorTeclado{
         //ArrayList<String> values = new ArrayList<String>(Arrays.asList(null,null,null,null,null));
         boolean seguir=true;
         while(seguir){
-            int result= (int) leerPorTeclado("¿Que datos desea modificar?" +
-                    "\n1) Nombre" +
-                    "\n2) Apellido" +
-                    "\n3) Email" +
-                    "\n4) Direccion" +
-                    "\n5) Medio de pago" +
-                    "\n6) Salir",Integer.class);
+            int result= 0;
+            try {
+                result = (int) leerPorTeclado("¿Que datos desea modificar?" +
+                        "\n1) Nombre" +
+                        "\n2) Apellido" +
+                        "\n3) Email" +
+                        "\n4) Direccion" +
+                        "\n5) Medio de pago" +
+                        "\n6) Salir",Integer.class);
+            } catch (EntradaInvalidaException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
             switch(result){
                 case 1:
                     //values.set(0,(String)leerPorTeclado("Ingrese nuevo Nombre:",String.class));
-                    this.nombre=leerPorTeclado("Ingrese nuevo Nombre:",String.class).toString();
+                    try {
+                        this.nombre=leerPorTeclado("Ingrese nuevo Nombre:",String.class).toString();
+                    } catch (EntradaInvalidaException e) {
+                        System.out.println("Error: " + e.getMessage());
+                        continue;
+                    }
                     break;
                 case 2:
                     //values.set(1,(String)leerPorTeclado("Ingrese nuevo Apellido:",String.class));
-                    this.apellido=leerPorTeclado("Ingrese apellido:",String.class).toString();
+                    try {
+                        this.apellido=leerPorTeclado("Ingrese apellido:",String.class).toString();
+                    } catch (EntradaInvalidaException e) {
+                        System.out.println("Error: " + e.getMessage());
+                        continue;
+                    }
                     break;
                 case 3:
                     //values.set(2,(String)leerPorTeclado("Ingrese nuevo Email:",String.class));
-                    this.email=leerPorTeclado("Ingrese Email:",String.class).toString();
+                    try {
+                        this.email=leerPorTeclado("Ingrese Email:",String.class).toString();
+                    } catch (EntradaInvalidaException e) {
+                        System.out.println("Error: " + e.getMessage());
+                        continue;
+                    }
                     break;
                 case 4:
                     //values.set(3,(String)leerPorTeclado("Ingrese nueva Direccion:",String.class));
-                    this.direccion=leerPorTeclado("Ingrese Direccion:",String.class).toString();
+                    try {
+                        this.direccion=leerPorTeclado("Ingrese Direccion:",String.class).toString();
+                    } catch (EntradaInvalidaException e) {
+                        System.out.println("Error: " + e.getMessage());
+                        continue;
+                    }
                     break;
                 case 5:
                     //values.set(4,(String)leerPorTeclado("Ingrese nuevo Medio de pago:",String.class));
-                    this.metodoPago=leerPorTeclado("Ingrese Nuevo Medio de pago",String.class).toString();
+                    try {
+                        this.metodoPago=leerPorTeclado("Ingrese Nuevo Medio de pago",String.class).toString();
+                    } catch (EntradaInvalidaException e) {
+                        System.out.println("Error: " + e.getMessage());
+                        continue;
+                    }
                     break;
                 default:
                     seguir=false;

@@ -13,7 +13,6 @@ public class Tablet extends Producto{
     }
     @Override
     public String getInfo() {
-
-       return "Tablet";
+        return String.format("%s\tMarca: %-8s\tPrecio: %-8.2f",this.categoria,this.marca,this.precio);
     }
 }
